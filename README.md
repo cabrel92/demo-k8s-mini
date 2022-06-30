@@ -4,10 +4,10 @@ Need a local Kubernetes cluster to quickly get to tinkering? Worry not, it is a 
 
 This repository holds a cluster template to obtain a simple setup from scratch.
 
-**You can enable asymmetric storage and pick from**:
+Pick from two structures:
 
 - 1 master node, 3 worker nodes with disks **(default)**
-- 1 master node, 3 worker nodes, 3 storage nodes with disks (enabled in Vagrantfile boolean value)
+- 1 master node, 3 worker nodes, 3 storage nodes with disks (enabled from the Vagrantfile)
 
 ## Pre-requisites
 
@@ -19,7 +19,7 @@ The following need to be installed on the host machine:
 
 ### Starting the cluster
 
-Start cluster using virtualization provider (VirtualBox or QEMU) given in the `Vagrantfile` config:
+Start cluster with the current `Vagrantfile` config:
 
 ```bash
 vagrant up
@@ -27,12 +27,13 @@ vagrant up
 
 To change configuration settings (i.e. number of worker nodes), edit the Vagrantfile as necessary. Options include:
 
-- Using VirtualBox or QEMU for virtualization.
-- Using Rook or MinIO as an S3-storage backend
-- Memory for machines
+- Asymmetrical storage
+- Memory used for VMs by category
+- Disabling CNI or Ingress controller install
 
 ## Cluster Features
 
+- Uses the private subnet `192.168.56.0/24` for nodes and `10.244.0.0/16` for pods
 - Calico as a CNI
 - NGINX Ingress controller
 - Minimal other installs to let you perform your own installs!
