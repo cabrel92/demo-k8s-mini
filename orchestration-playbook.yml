@@ -1,0 +1,33 @@
+- name: Setting up Docker and Kubernetes in all machines
+  hosts: all
+  become: true
+  roles:
+    - { role: common }
+
+- name: Initializing the cluster from the master node
+  hosts: k8s-master-*
+  become: true
+  gather_facts: false
+  roles:
+    - { role: master-k8s-init }
+
+- name: Joining the worker nodes to the cluster
+  hosts: k8s-worker-*
+  become: true
+  gather_facts: false
+  roles:
+    - { role: join-cluster }
+
+- name: Joining the storage nodes to the cluster (if present)
+  hosts: k8s-storage-*
+  become: true
+  gather_facts: false
+  roles:
+    - { role: join-cluster, when: asymmetric_storage | bool }
+
+- name: Installing Calico (Networking provider)
+  hosts: k8s-master-*
+  become: true
+  gather_facts: false
+  roles:
+    - { role: master-calico }

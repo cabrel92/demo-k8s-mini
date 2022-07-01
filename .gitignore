@@ -1,0 +1,8 @@
+.*
+!.eslintrc
+!.travis.yml
+!.gitignore
+!.github
+!.gitattributes
+lerna-debug.log
+/resources/kubeadm/join-command
