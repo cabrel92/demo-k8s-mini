@@ -39,9 +39,10 @@
   register: join_command
 
 - name: Saving join command to tmp file
-  shell: "echo {{ join_command.stdout_lines[0] }} >> /tmp/join-command.sh"
+  shell: "echo {{ join_command.stdout_lines[0] }} > /tmp/join-command.sh"
 
 - name: Exporting join command to host machine for propagation
   fetch:
     src: /tmp/join-command.sh
-    dest: "{{ resources_path }}kubeadm/join-command"
+    dest: "{{ resources_path }}kubeadm/"
+    flat: yes

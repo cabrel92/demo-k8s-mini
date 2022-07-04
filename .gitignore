@@ -5,4 +5,4 @@
 !.github
 !.gitattributes
 lerna-debug.log
-/resources/kubeadm/join-command
+/resources/kubeadm/join-command.sh

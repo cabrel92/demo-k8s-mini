@@ -1,8 +1,8 @@
 ---
 - name: Fetching the join command from host machine
   copy:
-    src: "{{ resources_path }}kubeadm/join-command"
-    dest: /tmp/join-command.sh
+    src: "{{ resources_path }}kubeadm/join-command.sh"
+    dest: /tmp/
     mode: 0777
 
 - name: Joining the node to cluster

@@ -26,7 +26,7 @@ STORAGE_CPU = 4
 STORAGE_DISKS = 2 # Nb of disks for each machine
 
 # Path for resource files relative to the Vagrantfile (such as the kubeadm config)
-RESOURCES_PATH = "resources/"
+RESOURCES_PATH = "./resources/"
 
 # ==================================================
 
@@ -44,19 +44,19 @@ end
 # Structure of dictionary content for each node: ip|cpus|memory|disks
 # Base dictionary for cluster
 cluster = {
-  "k8s-master-01" => { :ip => "192.168.56.10", :cpus => MASTER_CPU, :mem => MASTER_MEM, :disks => 0 },
-  "k8s-worker-01" => { :ip => "192.168.56.11", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => workers_disks },
-  "k8s-worker-02" => { :ip => "192.168.56.12", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => workers_disks },
-  "k8s-worker-03" => { :ip => "192.168.56.13", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => workers_disks }
+  "demo-master-01" => { :ip => "192.168.56.10", :cpus => MASTER_CPU, :mem => MASTER_MEM, :disks => 0 },
+  "demo-worker-01" => { :ip => "192.168.56.11", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => workers_disks },
+  "demo-worker-02" => { :ip => "192.168.56.12", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => workers_disks },
+  "demo-worker-03" => { :ip => "192.168.56.13", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => workers_disks }
 }
 # Expanded dictionary for asymmetric storage
 cluster_storage_nodes = {
-  "k8s-storage-01" => { :ip => "192.168.56.14", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => storage_disks },
-  "k8s-storage-02" => { :ip => "192.168.56.15", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => storage_disks },
-  "k8s-storage-03" => { :ip => "192.168.56.16", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => storage_disks }
+  "demo-storage-01" => { :ip => "192.168.56.14", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => storage_disks },
+  "demo-storage-02" => { :ip => "192.168.56.15", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => storage_disks },
+  "demo-storage-03" => { :ip => "192.168.56.16", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => storage_disks }
 }
 # Merge both dictionaries when asymmetric storage is set to true
-if (ASYMMETRIC_STORAGE == true)
+if ASYMMETRIC_STORAGE == true
   cluster.merge!(cluster_storage_nodes)
 end
 
@@ -86,6 +86,9 @@ Vagrant.configure("2") do |config|
         end
       when "libvirt"
         node.vm.box = LIBVIRT_IMAGE_NAME
+        node.vm.network :private_network,
+          :ip => info[:ip],
+          :libvirt__domain_name => "cluster.local"
         node.vm.provider VIRTUALIZATION_PROVIDER do |libvirt|
           libvirt.graphics_type = "none"
           libvirt.memory = info[:mem]
@@ -97,9 +100,6 @@ Vagrant.configure("2") do |config|
               :type => 'raw'
           end
         end
-        node.vm.network :private_network,
-          :ip => info[:ip],
-          :libvirt__domain_name => "cluster.local"
       end
       # For parallel usage of Vagrant at the end of the loop
       if index == cluster.length() - 1

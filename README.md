@@ -1,10 +1,10 @@
 # Kubernetes Cluster template repository
 
-Need a local Kubernetes cluster to quickly get to tinkering? Worry not, it is a mere `vagrant up` (and a couple of minutes) away.
+Need a local Kubernetes cluster to quickly get to tinkering? Worry not, it is a mere `vagrant up` away.
 
 This repository holds a cluster template to obtain a simple setup from scratch.
 
-Pick from two structures:
+Two structure options:
 
 - 1 master node, 3 worker nodes with disks **(default)**
 - 1 master node, 3 worker nodes, 3 storage nodes with disks (enabled from the Vagrantfile)
