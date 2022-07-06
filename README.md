@@ -2,7 +2,7 @@
 
 Need a local Kubernetes cluster to quickly get to tinkering? Worry not, it is a mere `vagrant up` away.
 
-This repository holds a cluster template to obtain a simple setup from scratch.
+This repository contains a cluster template to obtain a simple setup from scratch.
 
 Two structure options:
 
@@ -19,7 +19,7 @@ The following need to be installed on the host machine:
 
 ### Starting the cluster
 
-Start cluster with the current `Vagrantfile` config:
+Start the cluster with the current `Vagrantfile` config:
 
 ```bash
 vagrant up
@@ -47,11 +47,13 @@ vagrant destroy -f
 ## Cluster Features
 
 - Uses the private subnet `192.168.56.0/24` for nodes and `10.244.0.0/16` for pods
-- Nodes equipped with 2 disks each by default - either on workers or dedicated nodes
+- Each node equipped with 2 disks by default - either on workers or dedicated nodes
 - Calico as a CNI
 - Minimal other installs to leave room for your own!
 
 ## Using libvirt
+
+`libvirt` can be used as an alternate virtualization provider.
 
 See [Installing libvirt](./docs/virt-providers.md/#installing-libvirt).
 
