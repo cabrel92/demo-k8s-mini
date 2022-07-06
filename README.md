@@ -25,6 +25,12 @@ Start cluster with the current `Vagrantfile` config:
 vagrant up
 ```
 
+Access the cluster's master node:
+
+```bash
+vagrant ssh demo-master-01
+```
+
 To change configuration settings (i.e. number of worker nodes), edit the Vagrantfile as necessary. Options include:
 
 - Asymmetrical storage
