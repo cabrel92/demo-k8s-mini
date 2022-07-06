@@ -38,6 +38,12 @@ To change configuration settings (i.e. number of worker nodes), edit the Vagrant
 - Disabling CNI install
 - [Changing the virtualization provider](#using-libvirt)
 
+Turn off the cluster and clean up its resources:
+
+```bash
+vagrant destroy -f
+```
+
 ## Cluster Features
 
 - Uses the private subnet `192.168.56.0/24` for nodes and `10.244.0.0/16` for pods
