@@ -12,10 +12,11 @@
 - name: Injecting node ip in kubeadm config file
   command: "sed -i 's/ANSIBLE_NODE_IP/{{ node_ip }}/' kubeadm/kubeadm-config.yaml"
 
-# - name: Initializing the Kubernetes cluster using kubeadm through CLI options
+# - name: Initializing the Kubernetes cluster using kubeadm (CLI options)
 #   command: kubeadm init --apiserver-advertise-address="192.168.56.10" --apiserver-cert-extra-sans="192.168.56.10"  --node-name k8s-master --pod-network-cidr=192.168.0.0/16
 
-- name: Initializing the Kubernetes cluster using kubeadm through a config manifest
+- name: Initializing Kubernetes cluster using kubeadm (config manifest)
+  become: yes
   command: "{{ item }}"
   with_items:
     - echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
@@ -28,6 +29,7 @@
 #   command: export KUBECONFIG=/etc/kubernetes/admin.conf
 
 - name: Setting up kubeconfig for Vagrant user
+  become: yes
   command: "{{ item }}"
   with_items:
    - mkdir -p /home/vagrant/.kube
@@ -35,6 +37,7 @@
    - chown vagrant:vagrant /home/vagrant/.kube/config
 
 - name: Generating join command
+  become: yes
   command: kubeadm token create --print-join-command
   register: join_command
 

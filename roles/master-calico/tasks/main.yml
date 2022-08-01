@@ -4,10 +4,8 @@
   command: curl https://projectcalico.docs.tigera.io/manifests/calico.yaml -O
 
 - name: Install calico
-  become: false
   command: kubectl apply -f calico.yaml
 
 - name: Waiting for Calico pods init
-  become: false
   command: kubectl rollout status deployment/calico-kube-controllers -n kube-system
   ignore_errors: yes

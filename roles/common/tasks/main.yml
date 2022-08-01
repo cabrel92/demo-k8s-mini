@@ -4,6 +4,7 @@
     node_ip: "{{ ansible_eth1.ipv4.address }}"
 
 - name: Installing common packages
+  become: yes
   apt:
     name: "{{ packages }}"
     state: present
@@ -18,6 +19,7 @@
     - unzip
 
 - name: Installing packages to sync clock between nodes
+  become: yes
   apt:
     name: "{{ packages }}"
     state: present
@@ -28,16 +30,19 @@
     - ntpdate
 
 - name: Adding an apt signing key for Docker
+  become: yes
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
 
 - name: Adding apt repository for stable version of Docker
+  become: yes
   apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
     state: present
 
 - name: Installing Docker and its dependencies
+  become: yes
   apt:
     name: "{{ packages }}"
     state: present
@@ -49,16 +54,19 @@
     - containerd.io
 
 - name: Adding Vagrant user to Docker group
+  become: yes
   user:
     name: vagrant
     group: docker
 
 - name: Setting Docker cgroup driver to systemd to match kubelet
+  become: yes
   ansible.builtin.copy:
     content: '{ "exec-opts": ["native.cgroupdriver=systemd"] }'
     dest: /etc/docker/daemon.json
 
 - name: Reloading Docker services
+  become: yes
   command: "{{ item }}"
   with_items:
     - sudo systemctl daemon-reload
@@ -67,23 +75,27 @@
     - systemctl start docker.service
 
 - name: Adding the apt signing key for Kubernetes
+  become: yes
   apt_key:
     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
     state: present
 
 - name: Adding apt repository for Kubernetes
+  become: yes
   apt_repository:
     repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
     state: present
     filename: kubernetes.list
 
 - name: Giving the node ip to kubelet extra args
+  become: yes
   lineinfile:
     path: /etc/default/kubelet
     line: KUBELET_EXTRA_ARGS=--node-ip={{ node_ip }}
     create: yes
 
 - name: Installing Kubernetes binaries
+  become: yes
   apt:
     name: "{{ packages }}"
     state: present
@@ -95,11 +107,13 @@
       - kubectl=1.23.*
 
 - name: Enabling kubelet service
+  become: yes
   command: "{{ item }}"
   with_items:
     - sudo systemctl enable --now kubelet
 
 - name: Disabling swap
+  become: yes
   command: "{{ item }}"
   with_items:
     - sudo swapoff -a
