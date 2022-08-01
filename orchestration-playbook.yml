@@ -2,32 +2,41 @@
   hosts: all
   become: true
   roles:
-    - { role: common }
+    - role: common
 
 - name: Initializing the cluster from the master node
   hosts: demo-master-*
   become: true
   gather_facts: false
   roles:
-    - { role: master-k8s-init }
+    - role: master-k8s-init
 
 - name: Joining the worker nodes to the cluster
   hosts: demo-worker-*
   become: true
   gather_facts: false
   roles:
-    - { role: join-cluster }
+    - role: join-cluster
 
 - name: Joining the storage nodes to the cluster (if present)
   hosts: demo-storage-*
   become: true
   gather_facts: false
   roles:
-    - { role: join-cluster, when: asymmetric_storage | bool }
+    - role: join-cluster
+      when: asymmetric_storage | bool
 
 - name: Installing Calico (Networking provider)
   hosts: demo-master-*
   become: true
   gather_facts: false
   roles:
-    - { role: master-calico }
+    - role: master-calico
+
+- name: Labelling and taining storage nodes
+  hosts: demo-master-*
+  become: true
+  gather_facts: false
+  roles:
+    - role: master-calico
+      when: asymmetric_storage | bool

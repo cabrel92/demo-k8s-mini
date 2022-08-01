@@ -1,0 +1,18 @@
+- name: Registering storage nodes list
+  shell: kubectl get nodes -o=name |grep storage
+  register: storage_nodes
+
+- name: Labeling storage nodes
+  command: kubectl label {{ item }} storage-node=true
+  with_items: "{{ storage_nodes.stdout_lines }}"
+
+- name: Registering nodes with no storage label
+  command: kubectl get nodes -A -o=name --selector='!storage-node'
+  register: non_storage_nodes
+
+- name: Labelling nodes with no storage label as non-storage
+  command: kubectl label {{ item }} storage-node=false
+  with_items: "{{ non_storage_nodes.stdout_lines }}"
+
+- name: Tainting storage nodes to prevent scheduling
+  command: kubectl taint node -l storage-node=true storage-node=true:NoSchedule
