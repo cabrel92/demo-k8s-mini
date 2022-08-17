@@ -17,13 +17,17 @@ WORKERS_DISKS = 2
 
 # Enable or disable asymmetric storage
 # false: 1 master node, 3 worker nodes (with disks)
-# true: 1 master node, 3 worker nodes (diskless), 3 storage nodes (with disks)
+# true: 1 master node, 3 worker nodes, 3 storage nodes (with disks)
+# =>    Note: Worker nodes disks are still determined by WORKERS_DISKS value
 ASYMMETRIC_STORAGE = false
 
 # Resources for each storage node (only applied when ASYMMETRIC_STORAGE is true)
 STORAGE_MEM = 3072
 STORAGE_CPU = 4
 STORAGE_DISKS = 2 # Nb of disks for each machine
+
+# Disk size in Gi
+DISK_SIZE = 30
 
 # Path for resource files relative to the Vagrantfile (such as the kubeadm config)
 RESOURCES_PATH = "./resources/"
@@ -33,27 +37,19 @@ RESOURCES_PATH = "./resources/"
 VIRTUALBOX_IMAGE_NAME = "bento/ubuntu-20.04"
 LIBVIRT_IMAGE_NAME = "generic/ubuntu2004"
 
-# Conditionally set number of disks
-workers_disks = 0
-storage_disks = 0
-if ASYMMETRIC_STORAGE == true
-  storage_disks = STORAGE_DISKS
-else
-  workers_disks = WORKERS_DISKS
-end
 # Structure of dictionary content for each node: ip|cpus|memory|disks
 # Base dictionary for cluster
 cluster = {
   "demo-master-01" => { :ip => "192.168.56.10", :cpus => MASTER_CPU, :mem => MASTER_MEM, :disks => 0 },
-  "demo-worker-01" => { :ip => "192.168.56.11", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => workers_disks },
-  "demo-worker-02" => { :ip => "192.168.56.12", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => workers_disks },
-  "demo-worker-03" => { :ip => "192.168.56.13", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => workers_disks }
+  "demo-worker-01" => { :ip => "192.168.56.11", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => WORKERS_DISKS },
+  "demo-worker-02" => { :ip => "192.168.56.12", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => WORKERS_DISKS },
+  "demo-worker-03" => { :ip => "192.168.56.13", :cpus => WORKERS_CPU, :mem => WORKERS_MEM, :disks => WORKERS_DISKS }
 }
 # Expanded dictionary for asymmetric storage
 cluster_storage_nodes = {
-  "demo-storage-01" => { :ip => "192.168.56.14", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => storage_disks },
-  "demo-storage-02" => { :ip => "192.168.56.15", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => storage_disks },
-  "demo-storage-03" => { :ip => "192.168.56.16", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => storage_disks }
+  "demo-storage-01" => { :ip => "192.168.56.14", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => STORAGE_DISKS },
+  "demo-storage-02" => { :ip => "192.168.56.15", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => STORAGE_DISKS },
+  "demo-storage-03" => { :ip => "192.168.56.16", :cpus => STORAGE_CPU, :mem => STORAGE_MEM, :disks => STORAGE_DISKS }
 }
 # Merge both dictionaries when asymmetric storage is set to true
 if ASYMMETRIC_STORAGE == true
@@ -78,7 +74,7 @@ Vagrant.configure("2") do |config|
           (0...info[:disks]).each do |i|
             vb.customize ["modifyvm", :id, "--ioapic", "on"]
             # Creating a virtual disk called "<VM-name>-disk-n" with a size of 30GB
-            vb.customize ["createhd", "--filename", "#{hostname}-disks-#{i}", "--size", 30 * 1024]
+            vb.customize ["createhd", "--filename", "#{hostname}-disk-#{i}", "--size", DISK_SIZE * 1024]
             # Attaching the newly created virtual disk to our node
             vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 3 + i, "--device", 0, "--type", "hdd", "--medium", "#{hostname}-disk-#{i}.vdi"]
           end
@@ -95,7 +91,7 @@ Vagrant.configure("2") do |config|
           libvirt.cpus = info[:cpus]
           (0...info[:disks]).each do |i|
             libvirt.storage :file,
-              :size => "20G",
+              :size => "#{DISK_SIZE}G",
               :bus => "scsi",
               :type => 'raw'
           end
