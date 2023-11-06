@@ -24,7 +24,10 @@ Start the cluster with the current `Vagrantfile` config:
 ```bash
 vagrant up
 ```
-
+ I got this Error while connecting to libvirt error but it was simply a case that I was running vagrant up without specifying the provider
+```bash
+vagrant up --provider virtualbox
+```
 Access the cluster's master node:
 
 ```bash
