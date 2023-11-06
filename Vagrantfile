@@ -102,6 +102,7 @@ Vagrant.configure("2") do |config|
         node.vm.provision :ansible do |ansible|
           # Disable default limit to connect to all the machines
           ansible.limit = "all"
+          ansible.compatibility_mode = "2.0"
           ansible.playbook = "orchestration-playbook.yml"
           ansible.raw_arguments = ["--forks=#{cluster.length()}"]
           ansible.extra_vars = {
